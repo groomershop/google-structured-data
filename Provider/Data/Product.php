@@ -121,8 +121,8 @@ class Product
             '@type' => 'Product',
             'name' => $product->getName(),
             'image' => $this->getProductImages($product),
-            'sku' => str_replace('-', '', $product->getSku()),
-            'mpn' => $product->getSku(),
+            'sku' => $product->getSku(),
+            'mpn' => str_replace('-', '', $product->getSku()),
             'url' => $product->getProductUrl(),
             'itemCondition' => 'NewCondition'
         ];
@@ -130,7 +130,8 @@ class Product
 
         if($description = $this->getAttributeValue($product, 'short_description')) {
             $structuredData['description'] = $description;
-        } else if($description = $this->getAttributeValue($product, 'description')) {
+        }
+        if(empty($description) && $description = $this->getAttributeValue($product, 'description')) {
             $structuredData['description'] = $description;
         }
         
