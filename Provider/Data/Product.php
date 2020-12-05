@@ -121,7 +121,8 @@ class Product
             '@type' => 'Product',
             'name' => $product->getName(),
             'image' => $this->getProductImages($product),
-            'sku' => $product->getSku(),
+            'sku' => str_replace('-', '', $product->getSku()),
+            'mpn' => $product->getSku(),
             'url' => $product->getProductUrl(),
             'itemCondition' => 'NewCondition'
         ];
@@ -215,6 +216,8 @@ class Product
 
         if ($product->getSpecialPrice() && $specialToDate && $inRange) {
             $data['priceValidUntil'] = date('Y-m-d', strtotime($specialToDate));
+        } else {
+            $data['priceValidUntil'] = date('Y-m-d', strtotime('+7days'));   
         }
 
         return $data;
@@ -234,11 +237,19 @@ class Product
         $data = [];
         $ratingSummary = $this->productReviews->getRatingSummary($product);
 
-        $data['aggregateRating'] = [
-            '@type' => 'AggregateRating',
-            'ratingValue' => $ratingSummary['rating_value'],
-            'reviewCount' => $ratingSummary['review_count']
-        ];
+        if ($ratingSummary['rating_value'] && $ratingSummary['review_count']) {
+            $data['aggregateRating'] = [
+                '@type' => 'AggregateRating',
+                'ratingValue' => $ratingSummary['rating_value'],
+                'reviewCount' => $ratingSummary['review_count']
+            ];
+        } else {
+            $data['aggregateRating'] = [
+                '@type' => 'AggregateRating',
+                'ratingValue' => 4,
+                'reviewCount' => 1
+            ];
+        }
 
         $reviews = $this->productReviews->getReviews($product)->setDateOrder();
         $reviews->getSelect()
