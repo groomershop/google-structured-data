@@ -127,6 +127,16 @@ class Product
         ];
         $attributes = ['description', 'brand', 'manufacturer'];
 
+        if($description = $this->getAttributeValue($product, 'short_description')) {
+            $structuredData['description'] = $description;
+        } else if($description = $this->getAttributeValue($product, 'description')) {
+            $structuredData['description'] = $description;
+        }
+        
+        if($ean = $this->getAttributeValue($product, 'ean')) {
+            $structuredData['gtin'] = $ean;
+        }
+
         foreach ($attributes as $attribute) {
             $methodName = 'get' . ucfirst($attribute);
 
@@ -224,13 +234,11 @@ class Product
         $data = [];
         $ratingSummary = $this->productReviews->getRatingSummary($product);
 
-        if ($ratingSummary['rating_value'] && $ratingSummary['review_count']) {
-            $data['aggregateRating'] = [
-                '@type' => 'AggregateRating',
-                'ratingValue' => $ratingSummary['rating_value'],
-                'reviewCount' => $ratingSummary['review_count']
-            ];
-        }
+        $data['aggregateRating'] = [
+            '@type' => 'AggregateRating',
+            'ratingValue' => $ratingSummary['rating_value'],
+            'reviewCount' => $ratingSummary['review_count']
+        ];
 
         $reviews = $this->productReviews->getReviews($product)->setDateOrder();
         $reviews->getSelect()
@@ -262,9 +270,7 @@ class Product
             $reviewData[] = $row;
         }
 
-        if (!empty($reviewData)) {
-            $data['review'] = $reviewData;
-        }
+        $data['review'] = $reviewData;
 
         return $data;
     }
