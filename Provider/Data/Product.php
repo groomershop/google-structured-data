@@ -282,7 +282,9 @@ class Product
             $reviewData[] = $row;
         }
 
-        $data['review'] = $reviewData;
+        if (!empty($reviewData)) {
+            $data['review'] = $reviewData;
+        }
 
         return $data;
     }
