@@ -126,7 +126,7 @@ class Product
             'url' => $product->getProductUrl(),
             'itemCondition' => 'NewCondition'
         ];
-        $attributes = ['description', 'brand', 'manufacturer'];
+        $attributes = ['brand', 'manufacturer'];
 
         if($description = $this->getAttributeValue($product, 'short_description')) {
             $structuredData['description'] = $description;
